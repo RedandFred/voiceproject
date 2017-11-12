@@ -1,39 +1,50 @@
 import glob
 import logging
 import argparse
-from modelinterface import Nodelinterface
+from modelinterface import ModelInterface
+from utils import read_wav
+import os
+import itertools
 def main():
-	peoplelist = glob.glob("../../voicedata/VCTK-Corpus/wav48/*")
-	for person_dir in peoplelist:
-		logging.info("input data dir: {}".format(person_dir))
-		voicefile_list = glob.glob("{}/*".format(person_dir))
+    task_enroll("../../voicedata/VCTK-Corpus/wav48/", './test.txt')
+    #task_predict("../../voicedata/VCTK-Corpus/wav48/p225/", "./VCTC_Learned.txt")
 
-'''
 def task_enroll(input_dirs, output_model):
     m = ModelInterface()
-    input_dirs = [os.path.expanduser(k) for k in input_dibrs.strip().split()]
-    dirs = itertools.chain(*(glob.glob(d) for d in input_dirs))
-    dirs = [d for d in dirs if os.path.isdir(d)]
+    dirs = glob.glob(input_dirs + "*")
     files = []
-
-    for d in dirs:
+    #print(dirs)  
+    for d in dirs[:1]:
         label = os.path.basename(d.rstrip('/'))
+        print(label)
         wavs = glob.glob(d + '/*.wav')
+        #print(wavs)
 
-        print("Label {0} has files {1}".format(label, ','.join(wavs)))
-        for wav in wavs:
+        #print("Label {} has files {}".format(label, ','.join(wavs)))
+        if len(wavs) < 80:
+            asdf = len(wavs)
+        else: 
+            asdf = 80
+        for wav in wavs[:asdf]:
             fs, signal = read_wav(wav)  # fs : sample rate, signal : np array
             m.enroll(label, fs, signal)
 
     m.train()
     m.dump(output_model) # save trained things
-'''
 
 
+def task_predict(input_files, input_model):
+    m = ModelInterface.load(input_model)
+    fls = glob.glob(input_files+'*')[120:140]
+    fls.append('../../voicedata/VCTK-Corpus/wav48/p228/p228_001.wav')
+    for f in fls:
+        fs, signal = read_wav(f)
+        label = m.predict(fs, signal)
+        print(f, '->', label)
 
 if __name__ == '__main__':
-	logging.basicConfig(level=logging.DEBUG)
-	main()
+    logging.basicConfig(level=logging.DEBUG)
+    main()
 
 
 
@@ -48,9 +59,9 @@ if __name__ == '__main__':
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input',help='data dir', required=True)
 logging.basicConfig(level=logging.DEBUG)
-logging.debug("디버깅용 로그~~")
-logging.info("도움이 되는 정보를 남겨요~")
-logging.warning("주의해야되는곳!")
-logging.error("에러!!!")
-logging.critical("심각한 에러!!")
+logging.debug("")
+logging.info("")
+logging.warning("")
+logging.error()
+logging.critical()
 '''

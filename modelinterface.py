@@ -17,7 +17,9 @@ import traceback as tb
 #from feature import mix_feature
 import MFCC
 import LPC
-
+from skgmm import GMMSet
+from sklearn.mixture import GaussianMixture as GMM
+#from feature import mix_feature
 #from filters.VAD import VAD
 
 #try:
@@ -25,43 +27,35 @@ import LPC
 #    from gmmset import GMM
 #except:
 #    print >> sys.stderr, "Warning: failed to import fast-gmm, use gmm from scikit-learn instead"
-from skgmm import GMMSet, GMM
+
 
 CHECK_ACTIVE_INTERVAL = 1       # seconds
 
 class ModelInterface(object):
-
+    #from feature.LPC import extract2
+    #from feature.MFCC import extract
     UBM_MODEL_FILE = None
 
     def __init__(self):
         self.features = defaultdict(list)
         self.gmmset = GMMSet()
         #self.vad = VAD()
-
-    #def init_noise(self, fs, signal):
-        """
-        init vad from environment noise
-        """
-        #self.vad.init_noise(fs, signal)
-
-    #def filter(self, fs, signal):
-        """
-        use VAD (voice activity detection) to filter out silence part of a signal
-        """
-        #ret, intervals = self.vad.filter(fs, signal)
-        #orig_len = len(signal)
-
-        #if len(ret) > orig_len / 3:
-            # signal is filtered by VAD
-        #    return ret
-        #return np.array([])
-
+    '''
+    def mix_feature(self, tup):
+        mfcc = MFCC.extract(tup)
+        lpc = LPC.extract(tup)
+        if len(mfcc) == 0:
+            print(sys.stderr, "ERROR.. failed to extract mfcc feature:", len(tup[1]))
+        return np.concatenate((mfcc, lpc), axis=1)
+    '''
     def enroll(self, name, fs, signal):
         """
         add the signal to this person's training dataset
         name: person's name
         """
-        feat = mix_feature((fs, signal)) # output : np.array of a wave file, ""[mfcc, lpc]"",
+        mfcc = MFCC.extract((fs, signal))
+        lpc = LPC.extract2((fs, signal))
+        feat = np.concatenate((mfcc, lpc), axis=1) # output : np.array of a wave file, ""[mfcc, lpc]"",
         self.features[name].extend(feat) # label : name of a person, feature : defaultdict
 
     def _get_gmm_set(self):
@@ -72,6 +66,7 @@ class ModelInterface(object):
         start = time.time()
         print("Start training...")
         for name, feats in self.features.iteritems():
+            print(name)
             self.gmmset.fit_new(feats, name)
         print(time.time() - start, " seconds")
 
@@ -79,10 +74,13 @@ class ModelInterface(object):
         """
         return a label (name)
         """
-        try:
-            feat = mix_feature((fs, signal)) # feat : np.concatenate((mfcc, lpc), axis=1)
-        except:
-            pass
+        #try:
+        mfcc = MFCC.extract((fs, signal))
+        lpc = LPC.extract2((fs, signal))
+        feat = np.concatenate((mfcc, lpc), axis=1)
+        #feat = mix_feature((fs, signal)) # feat : np.concatenate((mfcc, lpc), axis=1)
+        #except:
+        #    pass
         return self.gmmset.predict_one(feat)
 
     def dump(self, fname):
@@ -100,12 +98,7 @@ class ModelInterface(object):
             R.gmmset.after_pickle()
             return R
 
-    def mix_feature(tup):
-        mfcc = MFCC.extract(tup)
-        lpc = LPC.extract(tup)
-        if len(mfcc) == 0:
-            print(sys.stderr, "ERROR.. failed to extract mfcc feature:", len(tup[1]))
-        return np.concatenate((mfcc, lpc), axis=1)
+
 
 if __name__ == "__main__":
     """ some testing"""

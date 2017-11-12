@@ -3,9 +3,9 @@
 # File: LPC.py
 # Date: Thu Mar 19 19:37:11 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
-'''
+
 import time
-#import scikits.talkbox as tb
+import scikits.talkbox as tb
 from scikits.talkbox.linpred import levinson_lpc
 from numpy import *
 from scipy.io import  wavfile
@@ -56,14 +56,9 @@ class LPCExtractor(object):
         feature[isnan(feature)] = 0
         return feature
 
-@cached_func
-def get_lpc_extractor(fs, win_length_ms=32, win_shift_ms=16,
-                       n_lpc=15, pre_emphasis_coef=0.95):
-    ret = LPCExtractor(fs, win_length_ms, win_shift_ms, n_lpc, pre_emphasis_coef)
-    return ret
 
 
-def extract(fs, signal=None, diff=False, **kwargs):
+def extract2(fs, signal=None, diff=False, **kwargs):
     """accept two argument, or one as a tuple"""
     if signal is None:
         assert type(fs) == tuple
@@ -74,11 +69,18 @@ def extract(fs, signal=None, diff=False, **kwargs):
         return diff_feature(ret)
     return ret
 
+@cached_func
+def get_lpc_extractor(fs, win_length_ms=32, win_shift_ms=16,
+                       n_lpc=15, pre_emphasis_coef=0.95):
+    ret = LPCExtractor(fs, win_length_ms, win_shift_ms, n_lpc, pre_emphasis_coef)
+    return ret
+
+
+
+
 if __name__ == "__main__":
     extractor = LPCCExtractor(8000)
     fs, signal = wavfile.read("../corpus.silence-removed/Style_Reading/f_001_03.wav")
     start = time.time()
-    ret = extractor.extract(signal)
+    ret = extractor.extract2(signal)
 
-'''
-import numpy
