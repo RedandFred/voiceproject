@@ -6,26 +6,28 @@ from utils import read_wav
 import os
 import itertools
 def main():
-    task_enroll("../../voicedata/VCTK-Corpus/wav48/", './test.txt')
+    print(1)
+    task_enroll("../../Downloads/VCTK-Corpus/wav48/", './test.txt')
     #task_predict("../../voicedata/VCTK-Corpus/wav48/p225/", "./VCTC_Learned.txt")
 
 def task_enroll(input_dirs, output_model):
     m = ModelInterface()
     dirs = glob.glob(input_dirs + "*")
     files = []
-    #print(dirs)  
-    for d in dirs[:1]:
+    print(dirs)  
+    for d in dirs:
         label = os.path.basename(d.rstrip('/'))
         print(label)
         wavs = glob.glob(d + '/*.wav')
         #print(wavs)
 
         #print("Label {} has files {}".format(label, ','.join(wavs)))
-        if len(wavs) < 80:
+        if len(wavs) < 150:
             asdf = len(wavs)
         else: 
-            asdf = 80
+            asdf = 150
         for wav in wavs[:asdf]:
+            print(wav)
             fs, signal = read_wav(wav)  # fs : sample rate, signal : np array
             m.enroll(label, fs, signal)
 

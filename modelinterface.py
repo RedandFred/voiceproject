@@ -21,7 +21,7 @@ from skgmm import GMMSet
 from sklearn.mixture import GaussianMixture as GMM
 #from feature import mix_feature
 #from filters.VAD import VAD
-
+import pickle
 #try:
 #    from gmmset import GMMSetPyGMM as GMMSet
 #    from gmmset import GMM
@@ -69,7 +69,10 @@ class ModelInterface(object):
             print(name)
             self.gmmset.fit_new(feats, name)
         print(time.time() - start, " seconds")
-
+        for i in range(len(self.gmmset.y)):
+            with open("./pickled/{}".format(self.gmmset.y[i]), 'wb') as ff:
+                pickle.dump((self.gmmset.y[i], self.gmmset.x[i]),ff)
+        sys.exit(1)
     def predict(self, fs, signal):
         """
         return a label (name)

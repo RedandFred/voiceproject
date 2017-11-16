@@ -14,11 +14,13 @@ class GMMSet(object):
         self.gmms = []
         self.gmm_order = gmm_order
         self.y = []
+        self.x = []
 
     def fit_new(self, x, label):
         self.y.append(label)
         gmm = GMM(self.gmm_order)
         gmm.fit(x)
+        self.x.append(gmm.precisions_)
         self.gmms.append(gmm)
 
     def gmm_score(self, gmm, x):
