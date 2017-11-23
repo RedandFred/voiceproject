@@ -1,8 +1,4 @@
-#!/usr/bin/env python2
-# -*- coding: UTF-8 -*-
-# File: interface.py
-# Date: Thu Sep 14 14:56:58 2017 -0700
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+
 
 import time
 import os
@@ -18,15 +14,8 @@ import traceback as tb
 import MFCC
 import LPC
 from skgmm import GMMSet
-from sklearn.mixture import GaussianMixture as GMM
-#from feature import mix_feature
-#from filters.VAD import VAD
+
 import pickle
-#try:
-#    from gmmset import GMMSetPyGMM as GMMSet
-#    from gmmset import GMM
-#except:
-#    print >> sys.stderr, "Warning: failed to import fast-gmm, use gmm from scikit-learn instead"
 
 
 CHECK_ACTIVE_INTERVAL = 1       # seconds

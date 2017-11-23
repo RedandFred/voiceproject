@@ -2,4 +2,6 @@ data
 *.txt
 *.pyc
 __pycache__
-pickled
+pickle
+.idea
+d
