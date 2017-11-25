@@ -1,2 +1,7 @@
 data
-
+*.txt
+*.pyc
+__pycache__
+pickle
+.idea
+pickled
